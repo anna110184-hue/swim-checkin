@@ -41,7 +41,8 @@ export default function StudentManageTable({ students, sessions, attendance, onS
   async function saveEdit() {
     if (!editId) return;
     setLoading(true);
-    const res = await fetch("/api/admin/students", { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ id: editId, ...form }) });
+    const { start_date, ...editFields } = form;
+    const res = await fetch("/api/admin/students", { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ id: editId, ...editFields }) });
     if (res.ok) { const u: Student = await res.json(); onStudentsChange(students.map((s) => s.id === editId ? u : s)); setEditId(null); }
     setLoading(false);
   }
