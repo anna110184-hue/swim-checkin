@@ -1,0 +1,55 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --gold: #A67C52;
+  --gold-dark: #8B6340;
+  --gold-light: #C4956A;
+  --cream: #F5F0E8;
+  --cream-dark: #EDE5D8;
+  --text: #2C2017;
+  --text-muted: #9A8878;
+}
+
+body {
+  background-color: var(--cream);
+  color: var(--text);
+  -webkit-font-smoothing: antialiased;
+}
+
+@layer components {
+  .btn-gold {
+    @apply bg-[#A67C52] hover:bg-[#8B6340] text-white font-bold rounded-2xl transition-all duration-200 active:scale-95 tracking-wide;
+  }
+
+  .btn-outline {
+    @apply border border-[#A67C52] text-[#A67C52] hover:bg-[#A67C52]/10 font-medium rounded-full transition-all duration-200 text-sm px-5 py-1.5;
+  }
+
+  .section-divider {
+    @apply flex items-center gap-4 text-[#9A8878] text-xs tracking-[0.25em] font-medium;
+  }
+
+  .section-divider::before,
+  .section-divider::after {
+    content: "";
+    @apply flex-1 h-px bg-[#D4C8B8];
+  }
+
+  .badge-paid {
+    @apply text-xs font-semibold px-3 py-1 rounded-full bg-[#E8F5E9] text-[#4CAF50] border border-[#C8E6C9];
+  }
+
+  .badge-unpaid {
+    @apply text-xs font-semibold px-3 py-1 rounded-full bg-[#FFF0F0] text-[#E57373] border border-[#FFCDD2];
+  }
+
+  .badge-regular {
+    @apply text-xs font-semibold px-3 py-1 rounded-full bg-[#EEF2FF] text-[#7986CB] border border-[#C5CAE9];
+  }
+
+  .badge-trial {
+    @apply text-xs font-semibold px-3 py-1 rounded-full bg-[#FFF8E1] text-[#FF8F00] border border-[#FFE082];
+  }
+}
