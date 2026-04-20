@@ -15,11 +15,28 @@ export interface Database {
           parent_email: string | null;
           created_at: string;
         };
-        Insert: Omit<Database["public"]["Tables"]["students"]["Row"], "id" | "created_at"> & {
+        Insert: {
           id?: string;
+          name: string;
+          parent_name: string;
+          time_slot: string;
+          day_of_week: "sat" | "sun";
+          payment_status?: "paid" | "unpaid";
+          course_type?: "regular" | "trial";
+          parent_email?: string | null;
           created_at?: string;
         };
-        Update: Partial<Database["public"]["Tables"]["students"]["Insert"]>;
+        Update: {
+          id?: string;
+          name?: string;
+          parent_name?: string;
+          time_slot?: string;
+          day_of_week?: "sat" | "sun";
+          payment_status?: "paid" | "unpaid";
+          course_type?: "regular" | "trial";
+          parent_email?: string | null;
+          created_at?: string;
+        };
       };
       sessions: {
         Row: {
@@ -29,11 +46,20 @@ export interface Database {
           start_date: string;
           created_at: string;
         };
-        Insert: Omit<Database["public"]["Tables"]["sessions"]["Row"], "id" | "created_at"> & {
+        Insert: {
           id?: string;
+          student_id: string;
+          total_classes?: number;
+          start_date: string;
           created_at?: string;
         };
-        Update: Partial<Database["public"]["Tables"]["sessions"]["Insert"]>;
+        Update: {
+          id?: string;
+          student_id?: string;
+          total_classes?: number;
+          start_date?: string;
+          created_at?: string;
+        };
       };
       attendance: {
         Row: {
@@ -45,11 +71,24 @@ export interface Database {
           is_cancelled: boolean;
           created_at: string;
         };
-        Insert: Omit<Database["public"]["Tables"]["attendance"]["Row"], "id" | "created_at"> & {
+        Insert: {
           id?: string;
+          student_id: string;
+          session_id: string;
+          attended_date: string;
+          is_makeup?: boolean;
+          is_cancelled?: boolean;
           created_at?: string;
         };
-        Update: Partial<Database["public"]["Tables"]["attendance"]["Insert"]>;
+        Update: {
+          id?: string;
+          student_id?: string;
+          session_id?: string;
+          attended_date?: string;
+          is_makeup?: boolean;
+          is_cancelled?: boolean;
+          created_at?: string;
+        };
       };
     };
     Views: {
