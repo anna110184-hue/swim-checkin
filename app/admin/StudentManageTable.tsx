@@ -67,6 +67,14 @@ export default function StudentManageTable({ students, sessions, attendance, onS
     setLoading(false);
   }
 
+  async function handleReset(id: string, name: string) {
+    if (!confirm(`確定要將「${name}」的出席紀錄歸零？此操作無法復原。`)) return;
+    setLoading(true);
+    await fetch("/api/admin/reset-attendance", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ student_id: id }) });
+    setLoading(false);
+    window.location.reload();
+  }
+
   const satCount = students.filter((s) => s.day_of_week === "sat").length;
   const sunCount = students.filter((s) => s.day_of_week === "sun").length;
 
@@ -190,6 +198,7 @@ export default function StudentManageTable({ students, sessions, attendance, onS
                   <td className="px-5 py-4">
                     <div className="flex gap-3">
                       <button onClick={() => startEdit(student)} className="text-xs text-[#A67C52] hover:underline font-medium">編輯</button>
+                      <button onClick={() => handleReset(student.id, student.name)} className="text-xs text-orange-400 hover:underline font-medium">歸零</button>
                       <button onClick={() => handleDelete(student.id)} className="text-xs text-[#E57373] hover:underline font-medium">刪除</button>
                     </div>
                   </td>
