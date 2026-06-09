@@ -27,9 +27,26 @@ export default function StudentManageTable({ students, sessions, attendance, onS
   const [form, setForm] = useState(emptyForm);
   const [showAdd, setShowAdd] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [totalMap, setTotalMap] = useState<Record<string, number>>(() =>
+    Object.fromEntries(sessions.map((s) => [s.student_id, s.total_classes]))
+  );
+  const [editingTotal, setEditingTotal] = useState<string | null>(null);
+  const [totalInput, setTotalInput] = useState("");
 
   function getAttendedCount(studentId: string) {
     return attendance.filter((a) => a.student_id === studentId && !a.is_cancelled).length;
+  }
+
+  async function saveTotal(studentId: string) {
+    const val = parseInt(totalInput);
+    if (isNaN(val) || val < 1 || val > 99) return;
+    await fetch("/api/admin/update-sessions", {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ student_id: studentId, total_classes: val }),
+    });
+    setTotalMap((prev) => ({ ...prev, [studentId]: val }));
+    setEditingTotal(null);
   }
 
   function startEdit(student: Student) {
@@ -137,7 +154,8 @@ export default function StudentManageTable({ students, sessions, attendance, onS
           <tbody className="divide-y divide-[#F5F0E8]">
             {displayed.map((student, idx) => {
               const count = getAttendedCount(student.id);
-              const pct = Math.round((count / 10) * 100);
+              const total = totalMap[student.id] ?? 10;
+              const pct = Math.round((count / total) * 100);
               if (editId === student.id) {
                 return (
                   <tr key={student.id}>
@@ -157,13 +175,37 @@ export default function StudentManageTable({ students, sessions, attendance, onS
                   </td>
                   <td className="px-5 py-4 text-[#9A8878]">{student.time_slot}</td>
                   <td className="px-5 py-4">
-                    <div className="space-y-1.5 min-w-[140px]">
-                      <div className="flex justify-between text-xs text-[#9A8878]">
-                        <span>{count} / 10 堂</span>
-                        <span>{pct}%</span>
+                    <div className="space-y-1.5 min-w-[160px]">
+                      <div className="flex justify-between items-center text-xs text-[#9A8878]">
+                        <span>{count} / {total} 堂</span>
+                        <div className="flex items-center gap-1">
+                          <span>{pct}%</span>
+                          {editingTotal === student.id ? (
+                            <div className="flex items-center gap-1 ml-1">
+                              <input
+                                type="number"
+                                value={totalInput}
+                                onChange={(e) => setTotalInput(e.target.value)}
+                                onKeyDown={(e) => { if (e.key === "Enter") saveTotal(student.id); if (e.key === "Escape") setEditingTotal(null); }}
+                                className="w-12 border border-[#A67C52] rounded-lg px-1.5 py-0.5 text-xs text-center focus:outline-none"
+                                min={1} max={99} autoFocus
+                              />
+                              <button onClick={() => saveTotal(student.id)} className="text-[#A67C52] hover:text-[#8B6340] text-xs font-bold">✓</button>
+                              <button onClick={() => setEditingTotal(null)} className="text-[#9A8878] hover:text-red-400 text-xs">✕</button>
+                            </div>
+                          ) : (
+                            <button
+                              onClick={() => { setEditingTotal(student.id); setTotalInput(String(total)); }}
+                              className="ml-1 text-[#9A8878] hover:text-[#A67C52] transition-colors"
+                              title="調整總堂數"
+                            >
+                              ✎
+                            </button>
+                          )}
+                        </div>
                       </div>
                       <div className="w-full bg-[#EDE5D8] rounded-full h-1.5 overflow-hidden">
-                        <div className="h-full bg-[#A67C52] rounded-full" style={{ width: `${pct}%` }} />
+                        <div className="h-full bg-[#A67C52] rounded-full" style={{ width: `${Math.min(pct, 100)}%` }} />
                       </div>
                     </div>
                   </td>
