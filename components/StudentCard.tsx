@@ -175,11 +175,6 @@ export default function StudentCard({
         {/* Payment section — appears after check-in */}
         {checked && (
           <div className="bg-[#FFFBF5] rounded-2xl p-4 border border-[#EDE5D8] space-y-2">
-            <p className="text-xs font-semibold text-[#A67C52]">本堂費用 $45</p>
-            <p className="text-xs text-[#9A8878]">
-              請轉帳至 Ann　PayID:{" "}
-              <span className="font-mono font-bold text-[#2C2017]">0423780409</span>
-            </p>
             {paymentClaimed ? (
               <div className="flex items-center gap-1.5 text-xs text-[#4CAF50] font-semibold">
                 ✓ 已通知轉帳
