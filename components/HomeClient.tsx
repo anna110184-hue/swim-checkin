@@ -14,6 +14,8 @@ interface StudentData {
   attended: number;
   total: number;
   checkedInToday: boolean;
+  substituteToday: string | null;
+  paymentClaimedToday: boolean;
   attendanceDates: string[];
   missedDates: string[];
 }
@@ -87,6 +89,8 @@ export default function HomeClient({ satStudents, sunStudents, today, defaultTab
               attended={s.attended}
               total={s.total}
               checkedInToday={s.checkedInToday}
+              substituteToday={s.substituteToday}
+              paymentClaimedToday={s.paymentClaimedToday}
               attendanceDates={s.attendanceDates}
               missedDates={s.missedDates}
             />

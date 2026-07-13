@@ -3,11 +3,16 @@ import { createServiceClient } from "@/lib/supabase/server";
 import { getTodayString } from "@/lib/utils";
 
 export async function POST(req: NextRequest) {
-  const { student_id, date } = await req.json();
+  const { student_id, date, substitute_name } = await req.json();
 
   if (!student_id) {
     return NextResponse.json({ error: "student_id required" }, { status: 400 });
   }
+
+  const substituteName: string | null =
+    typeof substitute_name === "string" && substitute_name.trim() !== ""
+      ? substitute_name.trim().slice(0, 50)
+      : null;
 
   const checkinDate: string = date ?? getTodayString();
   const supabase = createServiceClient();
@@ -33,6 +38,7 @@ export async function POST(req: NextRequest) {
       attended_date: checkinDate,
       is_makeup: date ? true : false,
       is_cancelled: false,
+      substitute_name: substituteName,
     },
     { onConflict: "student_id,attended_date" }
   );

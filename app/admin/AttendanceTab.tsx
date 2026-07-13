@@ -97,7 +97,9 @@ export default function AttendanceTab({ students, attendance, sessions }: Props)
                   <td className="px-5 py-3.5 font-medium text-[#2C2017]">{getStudentName(a.student_id)}</td>
                   <td className="px-5 py-3.5 text-[#9A8878]">{a.attended_date}</td>
                   <td className="px-5 py-3.5">
-                    {a.is_makeup
+                    {a.substitute_name
+                      ? <span className="text-xs font-semibold px-3 py-1 rounded-full bg-[#FFF3E0] text-[#EF9A3C] border border-[#FFE0B2]">{a.substitute_name} 代上</span>
+                      : a.is_makeup
                       ? <span className="text-xs font-semibold px-3 py-1 rounded-full bg-[#EEF2FF] text-[#7986CB] border border-[#C5CAE9]">補打</span>
                       : <span className="text-xs font-semibold px-3 py-1 rounded-full bg-[#FBF8F3] text-[#A67C52] border border-[#EDE5D8]">正常</span>}
                   </td>

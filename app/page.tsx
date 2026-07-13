@@ -27,12 +27,15 @@ export default async function HomePage() {
     const attended = sa.length;
     const total = student.sessions?.[0]?.total_classes ?? 10;
     const checkedInToday = attendanceDates.includes(today);
+    const todayRecord: any = sa.find((a: any) => a.attended_date === today);
+    const substituteToday: string | null = todayRecord?.substitute_name ?? null;
+    const paymentClaimedToday: boolean = todayRecord?.payment_claimed ?? false;
     const missedDates = last7.filter((d) => {
       const day = new Date(d).getDay();
       const dow = day === 6 ? "sat" : day === 0 ? "sun" : null;
       return dow === student.day_of_week && !attendanceDates.includes(d);
     });
-    return { ...student, attended, total, checkedInToday, attendanceDates, missedDates };
+    return { ...student, attended, total, checkedInToday, substituteToday, paymentClaimedToday, attendanceDates, missedDates };
   }
 
   const satStudents = (students ?? []).filter((s: any) => s.day_of_week === "sat").map(buildCardData);

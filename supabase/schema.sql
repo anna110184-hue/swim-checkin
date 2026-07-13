@@ -41,6 +41,7 @@ create table if not exists attendance (
   attended_date  date not null,
   is_makeup      boolean not null default false,
   is_cancelled   boolean not null default false,
+  substitute_name text,                -- 代課者名字（不為 null = 本堂由代課者出席）
   created_at     timestamptz not null default now(),
   -- one record per student per date
   unique (student_id, attended_date)

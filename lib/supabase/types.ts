@@ -69,6 +69,9 @@ export interface Database {
           attended_date: string;
           is_makeup: boolean;
           is_cancelled: boolean;
+          substitute_name: string | null;
+          payment_claimed: boolean;
+          payment_claimed_at: string | null;
           created_at: string;
         };
         Insert: {
@@ -78,6 +81,9 @@ export interface Database {
           attended_date: string;
           is_makeup?: boolean;
           is_cancelled?: boolean;
+          substitute_name?: string | null;
+          payment_claimed?: boolean;
+          payment_claimed_at?: string | null;
           created_at?: string;
         };
         Update: {
@@ -87,6 +93,9 @@ export interface Database {
           attended_date?: string;
           is_makeup?: boolean;
           is_cancelled?: boolean;
+          substitute_name?: string | null;
+          payment_claimed?: boolean;
+          payment_claimed_at?: string | null;
           created_at?: string;
         };
       };

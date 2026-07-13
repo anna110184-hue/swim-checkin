@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { Student, Session, Attendance } from "@/lib/supabase/types";
 import StudentManageTable from "./StudentManageTable";
 import AttendanceTab from "./AttendanceTab";
@@ -28,11 +29,19 @@ export default function AdminDashboard({ initialStudents, initialAttendance, ini
   return (
     <div className="space-y-6">
       {/* Stats banner */}
-      <div className="bg-white rounded-2xl border-l-4 border-[#A67C52] px-6 py-4 shadow-sm border border-[#EDE5D8]">
-        <p className="text-2xl font-black text-[#2C2017]">
-          累計打卡次數：<span className="text-[#A67C52]">{totalCheckins} 次</span>
-        </p>
-        <p className="text-sm text-[#9A8878] mt-0.5">所有學生合計已上課堂數</p>
+      <div className="flex items-center justify-between gap-4 flex-wrap">
+        <div className="bg-white rounded-2xl border-l-4 border-[#A67C52] px-6 py-4 shadow-sm border border-[#EDE5D8] flex-1">
+          <p className="text-2xl font-black text-[#2C2017]">
+            累計打卡次數：<span className="text-[#A67C52]">{totalCheckins} 次</span>
+          </p>
+          <p className="text-sm text-[#9A8878] mt-0.5">所有學生合計已上課堂數</p>
+        </div>
+        <Link
+          href="/admin/weekly-report"
+          className="btn-gold px-6 py-3 text-sm font-bold shrink-0"
+        >
+          📋 週報
+        </Link>
       </div>
 
       {/* Underline tabs */}

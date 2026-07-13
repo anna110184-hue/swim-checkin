@@ -19,6 +19,8 @@ interface StudentCardProps {
   attended: number;
   total: number;
   checkedInToday: boolean;
+  substituteToday: string | null;
+  paymentClaimedToday: boolean;
   attendanceDates: string[];
   missedDates: string[];
   today: string;
@@ -30,6 +32,8 @@ export default function StudentCard({
   attended,
   total,
   checkedInToday,
+  substituteToday,
+  paymentClaimedToday,
   attendanceDates,
   missedDates,
   today,
@@ -40,6 +44,10 @@ export default function StudentCard({
   const [showHistory, setShowHistory] = useState(false);
   const [showMakeup, setShowMakeup] = useState(false);
   const [makeupDone, setMakeupDone] = useState<string[]>([]);
+  const [showSubstitute, setShowSubstitute] = useState(false);
+  const [substituteInput, setSubstituteInput] = useState("");
+  const [substituteName, setSubstituteName] = useState<string | null>(substituteToday);
+  const [paymentClaimed, setPaymentClaimed] = useState(paymentClaimedToday);
 
   async function handleCheckin() {
     setLoading(true);
@@ -59,7 +67,37 @@ export default function StudentCard({
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ student_id: student.id }),
     });
-    if (res.ok) { setChecked(false); setCount((c) => Math.max(0, c - 1)); }
+    if (res.ok) { setChecked(false); setCount((c) => Math.max(0, c - 1)); setSubstituteName(null); }
+    setLoading(false);
+  }
+
+  async function handleSubstitute() {
+    const name = substituteInput.trim();
+    if (!name) return;
+    setLoading(true);
+    const res = await fetch("/api/checkin", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ student_id: student.id, substitute_name: name }),
+    });
+    if (res.ok) {
+      setChecked(true);
+      setCount((c) => c + 1);
+      setSubstituteName(name);
+      setShowSubstitute(false);
+      setSubstituteInput("");
+    }
+    setLoading(false);
+  }
+
+  async function handlePaymentClaim() {
+    setLoading(true);
+    const res = await fetch("/api/payment-claimed", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ student_id: student.id, date: today }),
+    });
+    if (res.ok) { setPaymentClaimed(true); }
     setLoading(false);
   }
 
@@ -110,10 +148,17 @@ export default function StudentCard({
         {/* Progress */}
         <ProgressDots attended={count} total={total} />
 
+        {/* Substitute badge */}
+        {checked && substituteName && (
+          <div className="bg-[#EEF2FF] text-[#7986CB] text-sm font-medium px-4 py-2.5 rounded-2xl border border-[#C5CAE9]">
+            本週由 {substituteName} 代上 ✓
+          </div>
+        )}
+
         {/* Check-in */}
         <div className="flex gap-2">
-          <button onClick={handleCheckin} disabled={loading} className="btn-gold flex-1 py-3 text-base">
-            {loading ? "處理中…" : "◎ 打卡"}
+          <button onClick={handleCheckin} disabled={loading || checked} className="btn-gold flex-1 py-3 text-base">
+            {loading ? "處理中…" : checked ? "✓ 已打卡" : "◎ 打卡"}
           </button>
           {checked && (
             <button
@@ -127,8 +172,37 @@ export default function StudentCard({
           )}
         </div>
 
+        {/* Payment section — appears after check-in */}
+        {checked && (
+          <div className="bg-[#FFFBF5] rounded-2xl p-4 border border-[#EDE5D8] space-y-2">
+            <p className="text-xs font-semibold text-[#A67C52]">本堂費用 $45</p>
+            <p className="text-xs text-[#9A8878]">
+              請轉帳至 Ann　PayID:{" "}
+              <span className="font-mono font-bold text-[#2C2017]">0423780409</span>
+            </p>
+            {paymentClaimed ? (
+              <div className="flex items-center gap-1.5 text-xs text-[#4CAF50] font-semibold">
+                ✓ 已通知轉帳
+              </div>
+            ) : (
+              <button
+                onClick={handlePaymentClaim}
+                disabled={loading}
+                className="btn-gold text-xs py-1.5 px-4"
+              >
+                {loading ? "處理中…" : "我已轉帳 ✓"}
+              </button>
+            )}
+          </div>
+        )}
+
         {/* Links */}
         <div className="flex gap-4 text-xs text-[#A67C52]">
+          {!checked && (
+            <button onClick={() => setShowSubstitute(!showSubstitute)} className="hover:underline">
+              找人代上
+            </button>
+          )}
           {availableMakeups.length > 0 && (
             <button onClick={() => setShowMakeup(!showMakeup)} className="hover:underline">
               補打卡（{availableMakeups.length}）
@@ -138,6 +212,30 @@ export default function StudentCard({
             出席紀錄
           </button>
         </div>
+
+        {/* Substitute panel */}
+        {showSubstitute && !checked && (
+          <div className="bg-[#FBF8F3] rounded-2xl p-3 space-y-2 border border-[#EDE5D8]">
+            <p className="text-xs font-semibold text-[#A67C52]">本週無法上課？填代課者名字（課照扣、費用照繳）</p>
+            <div className="flex gap-2">
+              <input
+                type="text"
+                value={substituteInput}
+                onChange={(e) => setSubstituteInput(e.target.value)}
+                placeholder="代課者名字"
+                maxLength={50}
+                className="flex-1 min-w-0 border border-[#EDE5D8] rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#A67C52]/40 bg-white"
+              />
+              <button
+                onClick={handleSubstitute}
+                disabled={loading || substituteInput.trim() === ""}
+                className="btn-gold text-xs py-1 px-3 shrink-0 disabled:opacity-50"
+              >
+                {loading ? "處理中…" : "確認代上"}
+              </button>
+            </div>
+          </div>
+        )}
 
         {/* Makeup panel */}
         {showMakeup && availableMakeups.length > 0 && (
