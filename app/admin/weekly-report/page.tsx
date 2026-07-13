@@ -1,6 +1,7 @@
 import { createServiceClient } from "@/lib/supabase/server";
 import { getThisWeekRange, formatDisplayDate } from "@/lib/utils";
 import Link from "next/link";
+import PrintButton from "./PrintButton";
 
 export const revalidate = 0;
 
@@ -51,15 +52,26 @@ export default async function WeeklyReportPage() {
   const sunDays = days.filter((d) => new Date(d).getDay() === 0);
 
   return (
-    <div className="min-h-screen bg-[#F5F0E8]">
-      <header className="bg-[#F5F0E8] px-6 pt-8 pb-4 max-w-4xl mx-auto flex items-center justify-between">
+    <div className="min-h-screen bg-[#F5F0E8] print:bg-white print:min-h-0">
+      <style>{`
+        @media print {
+          @page { size: A4; margin: 20mm; }
+          .print\\:hidden { display: none !important; }
+          body { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+        }
+      `}</style>
+
+      <header className="bg-[#F5F0E8] px-6 pt-8 pb-4 max-w-4xl mx-auto flex items-center justify-between print:bg-white print:pt-0">
         <div>
           <h1 className="text-3xl font-black text-[#2C2017] tracking-tight">週報</h1>
           <p className="text-sm font-medium text-[#A67C52] tracking-[0.2em] mt-0.5">
             {formatDisplayDate(start)} ～ {formatDisplayDate(end)}
           </p>
         </div>
-        <Link href="/admin" className="btn-outline text-sm">← 返回後台</Link>
+        <div className="flex items-center gap-3">
+          <PrintButton />
+          <Link href="/admin" className="btn-outline text-sm print:hidden">← 返回後台</Link>
+        </div>
       </header>
 
       <div className="h-px bg-[#D4C8B8] mx-6" />
