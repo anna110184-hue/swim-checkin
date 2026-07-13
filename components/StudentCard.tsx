@@ -56,7 +56,17 @@ export default function StudentCard({
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ student_id: student.id }),
     });
-    if (res.ok) { setChecked(true); setCount((c) => c + 1); }
+    if (res.ok) {
+      setChecked(true);
+      setCount((c) => c + 1);
+      // Auto-mark payment claimed for regular check-in
+      await fetch("/api/payment-claimed", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ student_id: student.id, date: today }),
+      });
+      setPaymentClaimed(true);
+    }
     setLoading(false);
   }
 
@@ -67,7 +77,12 @@ export default function StudentCard({
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ student_id: student.id }),
     });
-    if (res.ok) { setChecked(false); setCount((c) => Math.max(0, c - 1)); setSubstituteName(null); }
+    if (res.ok) {
+      setChecked(false);
+      setCount((c) => Math.max(0, c - 1));
+      setSubstituteName(null);
+      setPaymentClaimed(false);
+    }
     setLoading(false);
   }
 
@@ -174,8 +189,9 @@ export default function StudentCard({
 
         {/* Payment section — appears after check-in */}
         {checked && (
-          <div className="bg-[#FFFBF5] rounded-2xl p-4 border border-[#EDE5D8] space-y-2">
-            {paymentClaimed ? (
+          <div className="bg-[#FFFBF5] rounded-2xl p-4 border border-[#EDE5D8]">
+            {/* Regular check-in: auto confirmed; Substitute: needs manual click */}
+            {!substituteName || paymentClaimed ? (
               <div className="flex items-center gap-1.5 text-xs text-[#4CAF50] font-semibold">
                 ✓ 已通知轉帳
               </div>
