@@ -99,6 +99,32 @@ export interface Database {
           created_at?: string;
         };
       };
+      notices: {
+        Row: {
+          id: string;
+          title: string;
+          content: string;
+          is_active: boolean;
+          expires_at: string | null;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          title: string;
+          content: string;
+          is_active?: boolean;
+          expires_at?: string | null;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          title?: string;
+          content?: string;
+          is_active?: boolean;
+          expires_at?: string | null;
+          created_at?: string;
+        };
+      };
     };
     Views: {
       session_progress: {
@@ -118,4 +144,5 @@ export interface Database {
 export type Student = Database["public"]["Tables"]["students"]["Row"];
 export type Session = Database["public"]["Tables"]["sessions"]["Row"];
 export type Attendance = Database["public"]["Tables"]["attendance"]["Row"];
+export type Notice = Database["public"]["Tables"]["notices"]["Row"];
 export type SessionProgress = Database["public"]["Views"]["session_progress"]["Row"];

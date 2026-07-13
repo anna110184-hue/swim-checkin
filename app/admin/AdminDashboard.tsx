@@ -6,16 +6,19 @@ import { Student, Session, Attendance } from "@/lib/supabase/types";
 import StudentManageTable from "./StudentManageTable";
 import AttendanceTab from "./AttendanceTab";
 import MonthlyStats from "./MonthlyStats";
+import NoticesTab from "./NoticesTab";
+import { Notice } from "@/lib/supabase/types";
 
-type Tab = "students" | "attendance" | "stats";
+type Tab = "students" | "attendance" | "notices";
 
 interface Props {
   initialStudents: Student[];
   initialAttendance: Attendance[];
   initialSessions: Session[];
+  initialNotices: Notice[];
 }
 
-export default function AdminDashboard({ initialStudents, initialAttendance, initialSessions }: Props) {
+export default function AdminDashboard({ initialStudents, initialAttendance, initialSessions, initialNotices }: Props) {
   const [tab, setTab] = useState<Tab>("students");
   const [students, setStudents] = useState(initialStudents);
 
@@ -24,6 +27,7 @@ export default function AdminDashboard({ initialStudents, initialAttendance, ini
   const tabs: { key: Tab; label: string }[] = [
     { key: "students", label: "課程管理" },
     { key: "attendance", label: "打卡紀錄" },
+    { key: "notices", label: "重要通知" },
   ];
 
   return (
@@ -78,6 +82,9 @@ export default function AdminDashboard({ initialStudents, initialAttendance, ini
           attendance={initialAttendance}
           sessions={initialSessions}
         />
+      )}
+      {tab === "notices" && (
+        <NoticesTab initialNotices={initialNotices} />
       )}
     </div>
   );

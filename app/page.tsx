@@ -19,6 +19,12 @@ export default async function HomePage() {
     .select("*")
     .eq("is_cancelled", false);
 
+  const { data: notices } = await supabase
+    .from("notices")
+    .select("*")
+    .eq("is_active", true)
+    .order("created_at", { ascending: false });
+
   const last7 = getLast7Days();
 
   function buildCardData(student: any) {
@@ -58,7 +64,22 @@ export default async function HomePage() {
 
       <div className="h-px bg-[#D4C8B8] mx-6 max-w-7xl mx-auto" />
 
-      <main className="max-w-7xl mx-auto px-6 py-8">
+      <main className="max-w-7xl mx-auto px-6 py-8 space-y-6">
+        {/* Notice banners */}
+        {(notices ?? []).length > 0 && (
+          <div className="space-y-3">
+            {(notices ?? []).map((n: any) => (
+              <div key={n.id} className="bg-[#FFF8E7] border border-[#F5C842] rounded-2xl px-5 py-4 flex gap-3 items-start shadow-sm">
+                <span className="text-xl shrink-0 mt-0.5">📢</span>
+                <div>
+                  <p className="font-bold text-[#7A5200] text-sm">{n.title}</p>
+                  <p className="text-sm text-[#8A6200] mt-0.5 whitespace-pre-line">{n.content}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+
         <HomeClient
           satStudents={satStudents}
           sunStudents={sunStudents}
