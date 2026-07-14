@@ -57,7 +57,7 @@ export default async function HomePage() {
           <p className="text-sm font-medium text-[#A67C52] tracking-[0.3em] mt-1">ATTENDANCE · RECORD</p>
         </div>
         <div className="flex items-center gap-3 pt-2">
-          <a href="/admin/stats" className="btn-outline">月度統計</a>
+          <a href="/weekly-report" className="btn-outline">本週週報</a>
           <a href="/admin" className="btn-outline">管理後台</a>
         </div>
       </header>
