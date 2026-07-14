@@ -51,22 +51,19 @@ export default function AdminDashboard({ initialStudents, initialAttendance, ini
         </Link>
       </div>
 
-      {/* Underline tabs */}
-      <div className="flex gap-6 border-b border-[#D4C8B8] overflow-x-auto">
+      {/* Tabs */}
+      <div className="flex flex-wrap gap-2">
         {tabs.map((t) => (
           <button
             key={t.key}
             onClick={() => setTab(t.key)}
-            className={`pb-3 text-sm font-semibold transition-all relative ${
+            className={`px-4 py-2 rounded-xl text-sm font-semibold transition-all ${
               tab === t.key
-                ? "text-[#A67C52]"
-                : "text-[#9A8878] hover:text-[#A67C52]"
+                ? "bg-[#A67C52] text-white shadow-sm"
+                : "bg-white text-[#9A8878] border border-[#EDE5D8] hover:border-[#A67C52]/40"
             }`}
           >
             {t.label}
-            {tab === t.key && (
-              <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-[#A67C52] rounded-full" />
-            )}
           </button>
         ))}
       </div>
