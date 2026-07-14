@@ -13,20 +13,28 @@ export default function UploadSection({ weekStart, weekEnd, totalAmount, existin
   const [screenshotUrl, setScreenshotUrl] = useState<string | null>(existingUrl);
   const [uploading, setUploading] = useState(false);
   const [deleting, setDeleting] = useState(false);
+  const [errorMsg, setErrorMsg] = useState("");
   const fileRef = useRef<HTMLInputElement>(null);
 
   async function handleUpload(file: File) {
     setUploading(true);
+    setErrorMsg("");
     const form = new FormData();
     form.append("file", file);
     form.append("week_start", weekStart);
     form.append("week_end", weekEnd);
     form.append("total_amount", String(totalAmount));
 
-    const res = await fetch("/api/admin/payout-upload", { method: "POST", body: form });
-    if (res.ok) {
-      const { data } = await res.json();
-      setScreenshotUrl(data.screenshot_url);
+    try {
+      const res = await fetch("/api/admin/payout-upload", { method: "POST", body: form });
+      const json = await res.json();
+      if (!res.ok) {
+        setErrorMsg(`上傳失敗：${json.error ?? res.status}`);
+      } else {
+        setScreenshotUrl(json.data.screenshot_url);
+      }
+    } catch (e) {
+      setErrorMsg(`網路錯誤：${e instanceof Error ? e.message : String(e)}`);
     }
     setUploading(false);
   }
@@ -76,7 +84,7 @@ export default function UploadSection({ weekStart, weekEnd, totalAmount, existin
         </div>
       ) : (
         /* Upload area — hidden when printing */
-        <div className="print:hidden">
+        <div className="print:hidden space-y-2">
           <input
             ref={fileRef}
             type="file"
@@ -85,15 +93,16 @@ export default function UploadSection({ weekStart, weekEnd, totalAmount, existin
             onChange={(e) => {
               const file = e.target.files?.[0];
               if (file) handleUpload(file);
+              e.target.value = "";
             }}
           />
           <button
             onClick={() => fileRef.current?.click()}
             disabled={uploading}
-            className="flex items-center gap-2 bg-white border-2 border-dashed border-[#D4C8B8] rounded-2xl px-8 py-6 text-sm text-[#9A8878] hover:border-[#A67C52] hover:text-[#A67C52] transition-colors w-full justify-center"
+            className="flex items-center gap-2 bg-white border-2 border-dashed border-[#D4C8B8] rounded-2xl px-8 py-6 text-sm text-[#9A8878] hover:border-[#A67C52] hover:text-[#A67C52] transition-colors w-full justify-center disabled:opacity-60"
           >
             {uploading ? (
-              <span>上傳中…</span>
+              <span>上傳中…請稍候</span>
             ) : (
               <>
                 <span className="text-2xl">📎</span>
@@ -101,6 +110,11 @@ export default function UploadSection({ weekStart, weekEnd, totalAmount, existin
               </>
             )}
           </button>
+          {errorMsg && (
+            <p className="text-xs text-[#E57373] bg-[#FFF0F0] px-4 py-2 rounded-xl border border-[#FFCDD2]">
+              ⚠️ {errorMsg}
+            </p>
+          )}
         </div>
       )}
     </div>
