@@ -7,16 +7,24 @@ export default async function AdminPage() {
   const supabase = createClient();
   const service = createServiceClient();
 
-  const [{ data: students }, { data: attendance }, { data: sessions }, { data: notices }, { data: settings }] = await Promise.all([
+  const [{ data: students }, { data: attendance }, { data: sessions }, { data: notices }] = await Promise.all([
     supabase.from("students").select("*").order("day_of_week").order("time_slot"),
     supabase.from("attendance").select("*").order("attended_date", { ascending: false }),
     supabase.from("sessions").select("*"),
     supabase.from("notices").select("*").order("created_at", { ascending: false }),
-    service.from("settings").select("*"),
   ]);
 
-  function getSetting(key: string, fallback = "true") {
-    return (settings ?? []).find((s: any) => s.key === key)?.value ?? fallback;
+  let showSat = true;
+  let showSun = true;
+  try {
+    const { data: settings } = await service.from("settings").select("*");
+    if (settings) {
+      const find = (key: string) => (settings as any[]).find((s) => s.key === key)?.value;
+      if (find("show_saturday") !== undefined) showSat = find("show_saturday") === "true";
+      if (find("show_sunday") !== undefined) showSun = find("show_sunday") === "true";
+    }
+  } catch {
+    // settings table not yet created — use defaults
   }
 
   return (
@@ -25,8 +33,8 @@ export default async function AdminPage() {
       initialAttendance={attendance ?? []}
       initialSessions={sessions ?? []}
       initialNotices={notices ?? []}
-      initialShowSat={getSetting("show_saturday") === "true"}
-      initialShowSun={getSetting("show_sunday") === "true"}
+      initialShowSat={showSat}
+      initialShowSun={showSun}
     />
   );
 }
