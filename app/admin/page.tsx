@@ -1,5 +1,4 @@
-import { createClient } from "@/lib/supabase/server";
-import { createServiceClient } from "@/lib/supabase/server";
+import { createClient, createServiceClient } from "@/lib/supabase/server";
 import AdminDashboard from "./AdminDashboard";
 
 export const revalidate = 0;

@@ -5,7 +5,6 @@ import Link from "next/link";
 import { Student, Session, Attendance } from "@/lib/supabase/types";
 import StudentManageTable from "./StudentManageTable";
 import AttendanceTab from "./AttendanceTab";
-import MonthlyStats from "./MonthlyStats";
 import NoticesTab from "./NoticesTab";
 import PageSettingsTab from "./PageSettingsTab";
 import { Notice } from "@/lib/supabase/types";

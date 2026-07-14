@@ -1,5 +1,4 @@
-import { createClient } from "@/lib/supabase/server";
-import { createServiceClient } from "@/lib/supabase/server";
+import { createClient, createServiceClient } from "@/lib/supabase/server";
 import { getTodayString, getTodayDayOfWeek, getLast7Days } from "@/lib/utils";
 import HomeClient from "@/components/HomeClient";
 
