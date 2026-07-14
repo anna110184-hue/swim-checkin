@@ -163,6 +163,17 @@ export default function StudentCard({
         {/* Progress */}
         <ProgressDots attended={count} total={total} />
 
+        {/* Course completed banner */}
+        {count >= total && total > 0 && (
+          <div className="bg-[#FFF3E0] border border-[#FFB74D] rounded-2xl px-4 py-3 flex items-center gap-2">
+            <span className="text-lg">🎓</span>
+            <div>
+              <p className="text-xs font-bold text-[#E65100]">課程已完成！</p>
+              <p className="text-xs text-[#BF360C] mt-0.5">請聯繫老師安排續課</p>
+            </div>
+          </div>
+        )}
+
         {/* Substitute badge */}
         {checked && substituteName && (
           <div className="bg-[#EEF2FF] text-[#7986CB] text-sm font-medium px-4 py-2.5 rounded-2xl border border-[#C5CAE9]">
@@ -172,7 +183,7 @@ export default function StudentCard({
 
         {/* Check-in */}
         <div className="flex gap-2">
-          <button onClick={handleCheckin} disabled={loading || checked} className="btn-gold flex-1 py-3 text-base">
+          <button onClick={handleCheckin} disabled={loading || checked || (count >= total && !checked)} className="btn-gold flex-1 py-3 text-base">
             {loading ? "處理中…" : checked ? "✓ 已打卡" : "◎ 打卡"}
           </button>
           {checked && (
