@@ -218,20 +218,29 @@ export default function StudentCard({
           </div>
         )}
 
-        {/* Links */}
-        <div className="flex gap-4 text-xs text-[#A67C52]">
+        {/* Action buttons */}
+        <div className="flex flex-wrap gap-2">
           {!checked && (
-            <button onClick={() => setShowSubstitute(!showSubstitute)} className="hover:underline">
-              找人代上
+            <button
+              onClick={() => setShowSubstitute(!showSubstitute)}
+              className="flex-1 text-xs font-semibold px-3 py-2 rounded-xl border-2 border-[#7986CB] text-[#5C6BC0] bg-[#EEF2FF] hover:bg-[#E8EAF6] active:bg-[#C5CAE9] transition-colors"
+            >
+              👥 找人代上
             </button>
           )}
           {availableMakeups.length > 0 && (
-            <button onClick={() => setShowMakeup(!showMakeup)} className="hover:underline">
-              補打卡（{availableMakeups.length}）
+            <button
+              onClick={() => setShowMakeup(!showMakeup)}
+              className="flex-1 text-xs font-semibold px-3 py-2 rounded-xl border-2 border-[#66BB6A] text-[#388E3C] bg-[#E8F5E9] hover:bg-[#DCEDC8] active:bg-[#C8E6C9] transition-colors"
+            >
+              ＋ 補打卡（{availableMakeups.length}）
             </button>
           )}
-          <button onClick={() => setShowHistory(!showHistory)} className="hover:underline ml-auto">
-            出席紀錄
+          <button
+            onClick={() => setShowHistory(!showHistory)}
+            className="flex-1 text-xs font-semibold px-3 py-2 rounded-xl border-2 border-[#D4C8B8] text-[#A67C52] bg-[#FBF8F3] hover:bg-[#F5F0E8] active:bg-[#EDE5D8] transition-colors"
+          >
+            📋 出席紀錄
           </button>
         </div>
 
