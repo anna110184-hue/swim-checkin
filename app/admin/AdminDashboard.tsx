@@ -52,7 +52,7 @@ export default function AdminDashboard({ initialStudents, initialAttendance, ini
       </div>
 
       {/* Underline tabs */}
-      <div className="flex gap-8 border-b border-[#D4C8B8]">
+      <div className="flex gap-6 border-b border-[#D4C8B8] overflow-x-auto">
         {tabs.map((t) => (
           <button
             key={t.key}
