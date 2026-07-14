@@ -60,13 +60,11 @@ export default async function PublicWeeklyReportPage() {
 
       <main className="max-w-3xl mx-auto px-6 py-8 space-y-8">
 
-        {/* Summary */}
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+        {/* Summary — Saturday only */}
+        <div className="grid grid-cols-2 gap-3">
           {[
             { label: "週六出席", value: `${satAttended} 位`, sub: `共 ${satStudents.length} 位` },
-            { label: "週日出席", value: `${sunAttended} 位`, sub: `共 ${sunStudents.length} 位` },
-            { label: "本週總堂數", value: `${totalLessons} 堂`, sub: "每堂 $45" },
-            { label: "應付老師", value: `$${totalAmount}`, sub: "本週合計" },
+            { label: "本週總堂數", value: `${satStudents.filter((s: any) => s.attended).length} 堂`, sub: "每堂 $45" },
           ].map((c) => (
             <div key={c.label} className="bg-white rounded-2xl border border-[#EDE5D8] p-4 text-center">
               <p className="text-xs text-[#9A8878] font-semibold">{c.label}</p>
@@ -76,7 +74,7 @@ export default async function PublicWeeklyReportPage() {
           ))}
         </div>
 
-        {/* Saturday */}
+        {/* Saturday only */}
         {satDays.length > 0 && satStudents.length > 0 && (
           <DaySection
             title={`週六　${satDays.map(formatDisplayDate).join("、")}`}
@@ -84,19 +82,13 @@ export default async function PublicWeeklyReportPage() {
           />
         )}
 
-        {/* Sunday */}
-        {sunDays.length > 0 && sunStudents.length > 0 && (
-          <DaySection
-            title={`週日　${sunDays.map(formatDisplayDate).join("、")}`}
-            students={sunStudents}
-          />
-        )}
-
-        {totalLessons === 0 && (
+        {satAttended === 0 && (
           <div className="bg-white rounded-2xl border border-[#EDE5D8] p-10 text-center text-[#9A8878]">
             本週尚無出席紀錄
           </div>
         )}
+
+        {/* Sunday is intentionally hidden from parent view */}
 
         {/* Payout screenshot */}
         {(payout as any)?.screenshot_url && (
