@@ -68,32 +68,15 @@ export default async function HomePage() {
         {/* Notice banners */}
         {(notices ?? []).length > 0 && (
           <div className="space-y-3">
-            {(notices ?? []).map((n: any) => {
-              let expiryLabel: string | null = null;
-              if (n.expires_at) {
-                const msLeft = new Date(n.expires_at).getTime() - new Date(today).getTime();
-                const daysLeft = Math.round(msLeft / 86400000);
-                if (daysLeft === 0) expiryLabel = "今天到期";
-                else if (daysLeft === 1) expiryLabel = "明天到期";
-                else if (daysLeft <= 7) expiryLabel = `還有 ${daysLeft} 天到期`;
-              }
-              return (
-                <div key={n.id} className="bg-[#FFF8E7] border border-[#F5C842] rounded-2xl px-5 py-4 flex gap-3 items-start shadow-sm">
-                  <span className="text-xl shrink-0 mt-0.5">📢</span>
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2 flex-wrap">
-                      <p className="font-bold text-[#7A5200] text-sm">{n.title}</p>
-                      {expiryLabel && (
-                        <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-[#FFE0B2] text-[#E65100] border border-[#FFCC80]">
-                          {expiryLabel}
-                        </span>
-                      )}
-                    </div>
-                    <p className="text-sm text-[#8A6200] mt-0.5 whitespace-pre-line">{n.content}</p>
-                  </div>
+            {(notices ?? []).map((n: any) => (
+              <div key={n.id} className="bg-[#FFF8E7] border border-[#F5C842] rounded-2xl px-5 py-4 flex gap-3 items-start shadow-sm">
+                <span className="text-xl shrink-0 mt-0.5">📢</span>
+                <div className="flex-1 min-w-0">
+                  <p className="font-bold text-[#7A5200] text-sm">{n.title}</p>
+                  <p className="text-sm text-[#8A6200] mt-0.5 whitespace-pre-line">{n.content}</p>
                 </div>
-              );
-            })}
+              </div>
+            ))}
           </div>
         )}
 

@@ -113,9 +113,16 @@ export default function NoticesTab({ initialNotices }: Props) {
               <div className="flex-1 min-w-0 space-y-1">
                 <p className="font-bold text-[#2C2017]">{n.title}</p>
                 <p className="text-sm text-[#9A8878] whitespace-pre-line">{n.content}</p>
-                <div className="flex items-center gap-3 text-xs text-[#9A8878] mt-1">
-                  <span>發布：{n.created_at.slice(0, 10)}</span>
-                  {n.expires_at && <span>到期：{n.expires_at}</span>}
+                <div className="flex items-center gap-3 text-xs mt-1 flex-wrap">
+                  <span className="text-[#9A8878]">發布：{n.created_at.slice(0, 10)}</span>
+                  {n.expires_at && (() => {
+                    const msLeft = new Date(n.expires_at).getTime() - new Date().setHours(0, 0, 0, 0);
+                    const daysLeft = Math.round(msLeft / 86400000);
+                    if (daysLeft <= 0) return <span className="font-semibold text-[#E57373]">今天到期</span>;
+                    if (daysLeft === 1) return <span className="font-semibold text-[#E57373]">明天到期</span>;
+                    if (daysLeft <= 7) return <span className="font-semibold text-[#EF9A3C]">還有 {daysLeft} 天到期</span>;
+                    return <span className="text-[#9A8878]">到期：{n.expires_at}</span>;
+                  })()}
                 </div>
               </div>
               <button
