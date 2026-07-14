@@ -2,6 +2,7 @@ import { createServiceClient } from "@/lib/supabase/server";
 import { getThisWeekRange, formatDisplayDate } from "@/lib/utils";
 import Link from "next/link";
 import PrintButton from "./PrintButton";
+import UploadSection from "./UploadSection";
 
 export const revalidate = 0;
 
@@ -11,13 +12,14 @@ export default async function WeeklyReportPage() {
   const supabase = createServiceClient();
   const { start, end, days } = getThisWeekRange();
 
-  const [{ data: students }, { data: attendance }] = await Promise.all([
+  const [{ data: students }, { data: attendance }, { data: payout }] = await Promise.all([
     supabase.from("students").select("*").order("day_of_week").order("time_slot"),
     supabase
       .from("attendance")
       .select("*")
       .gte("attended_date", start)
       .lte("attended_date", end),
+    supabase.from("weekly_payouts").select("*").eq("week_start", start).maybeSingle(),
   ]);
 
   const studentList = students ?? [];
@@ -109,6 +111,14 @@ export default async function WeeklyReportPage() {
             本週尚無出席紀錄
           </div>
         )}
+
+        {/* Payout screenshot */}
+        <UploadSection
+          weekStart={start}
+          weekEnd={end}
+          totalAmount={totalAmount}
+          existingUrl={(payout as any)?.screenshot_url ?? null}
+        />
       </main>
     </div>
   );
