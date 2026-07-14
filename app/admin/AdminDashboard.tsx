@@ -7,18 +7,21 @@ import StudentManageTable from "./StudentManageTable";
 import AttendanceTab from "./AttendanceTab";
 import MonthlyStats from "./MonthlyStats";
 import NoticesTab from "./NoticesTab";
+import PageSettingsTab from "./PageSettingsTab";
 import { Notice } from "@/lib/supabase/types";
 
-type Tab = "students" | "attendance" | "notices";
+type Tab = "students" | "attendance" | "notices" | "settings";
 
 interface Props {
   initialStudents: Student[];
   initialAttendance: Attendance[];
   initialSessions: Session[];
   initialNotices: Notice[];
+  initialShowSat: boolean;
+  initialShowSun: boolean;
 }
 
-export default function AdminDashboard({ initialStudents, initialAttendance, initialSessions, initialNotices }: Props) {
+export default function AdminDashboard({ initialStudents, initialAttendance, initialSessions, initialNotices, initialShowSat, initialShowSun }: Props) {
   const [tab, setTab] = useState<Tab>("students");
   const [students, setStudents] = useState(initialStudents);
 
@@ -28,6 +31,7 @@ export default function AdminDashboard({ initialStudents, initialAttendance, ini
     { key: "students", label: "課程管理" },
     { key: "attendance", label: "打卡紀錄" },
     { key: "notices", label: "重要通知" },
+    { key: "settings", label: "頁面設定" },
   ];
 
   return (
@@ -85,6 +89,9 @@ export default function AdminDashboard({ initialStudents, initialAttendance, ini
       )}
       {tab === "notices" && (
         <NoticesTab initialNotices={initialNotices} />
+      )}
+      {tab === "settings" && (
+        <PageSettingsTab initialShowSat={initialShowSat} initialShowSun={initialShowSun} />
       )}
     </div>
   );

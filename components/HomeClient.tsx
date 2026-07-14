@@ -25,9 +25,11 @@ interface Props {
   sunStudents: StudentData[];
   today: string;
   defaultTab: "sat" | "sun";
+  showSat?: boolean;
+  showSun?: boolean;
 }
 
-export default function HomeClient({ satStudents, sunStudents, today, defaultTab }: Props) {
+export default function HomeClient({ satStudents, sunStudents, today, defaultTab, showSat = true, showSun = true }: Props) {
   const [tab, setTab] = useState<"sat" | "sun">(defaultTab);
   const students = tab === "sat" ? satStudents : sunStudents;
 
@@ -35,35 +37,39 @@ export default function HomeClient({ satStudents, sunStudents, today, defaultTab
   const unpaidCount = students.filter((s) => s.payment_status === "unpaid").length;
   const sectionLabel = tab === "sat" ? "SATURDAY SCHEDULE" : "SUNDAY SCHEDULE";
 
+  const visibleTabs = (["sat", "sun"] as const).filter((t) => (t === "sat" ? showSat : showSun));
+
   return (
     <div className="space-y-6">
-      {/* Tab switcher */}
-      <div className="flex gap-2">
-        {(["sat", "sun"] as const).map((t) => {
-          const count = t === "sat" ? satStudents.length : sunStudents.length;
-          const active = tab === t;
-          return (
-            <button
-              key={t}
-              onClick={() => setTab(t)}
-              className={`flex items-center gap-2 px-6 py-2.5 rounded-2xl text-sm font-bold transition-all duration-200 ${
-                active
-                  ? "bg-[#A67C52] text-white shadow-sm"
-                  : "bg-white text-[#9A8878] border border-[#EDE5D8] hover:border-[#A67C52]/40"
-              }`}
-            >
-              {t === "sat" ? "週六" : "週日"}
-              <span
-                className={`text-xs font-bold px-2 py-0.5 rounded-full ${
-                  active ? "bg-white/20 text-white" : "bg-[#EDE5D8] text-[#9A8878]"
+      {/* Tab switcher — only show if more than one tab is visible */}
+      {visibleTabs.length > 1 && (
+        <div className="flex gap-2">
+          {visibleTabs.map((t) => {
+            const count = t === "sat" ? satStudents.length : sunStudents.length;
+            const active = tab === t;
+            return (
+              <button
+                key={t}
+                onClick={() => setTab(t)}
+                className={`flex items-center gap-2 px-6 py-2.5 rounded-2xl text-sm font-bold transition-all duration-200 ${
+                  active
+                    ? "bg-[#A67C52] text-white shadow-sm"
+                    : "bg-white text-[#9A8878] border border-[#EDE5D8] hover:border-[#A67C52]/40"
                 }`}
               >
-                {count}
-              </span>
-            </button>
-          );
-        })}
-      </div>
+                {t === "sat" ? "週六" : "週日"}
+                <span
+                  className={`text-xs font-bold px-2 py-0.5 rounded-full ${
+                    active ? "bg-white/20 text-white" : "bg-[#EDE5D8] text-[#9A8878]"
+                  }`}
+                >
+                  {count}
+                </span>
+              </button>
+            );
+          })}
+        </div>
+      )}
 
       {/* Section divider */}
       <div className="section-divider">{sectionLabel}</div>
