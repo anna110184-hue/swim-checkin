@@ -30,8 +30,13 @@ export default function StudentManageTable({ students, sessions, attendance, onS
   const [totalMap, setTotalMap] = useState<Record<string, number>>(() =>
     Object.fromEntries(sessions.map((s) => [s.student_id, s.total_classes]))
   );
+  const [paidMap, setPaidMap] = useState<Record<string, number | null>>(() =>
+    Object.fromEntries(sessions.map((s) => [s.student_id, s.paid_lessons ?? null]))
+  );
   const [editingTotal, setEditingTotal] = useState<string | null>(null);
   const [totalInput, setTotalInput] = useState("");
+  const [editingPaid, setEditingPaid] = useState<string | null>(null);
+  const [paidInput, setPaidInput] = useState("");
 
   function getAttendedCount(studentId: string) {
     return attendance.filter((a) => a.student_id === studentId && !a.is_cancelled).length;
@@ -47,6 +52,19 @@ export default function StudentManageTable({ students, sessions, attendance, onS
     });
     setTotalMap((prev) => ({ ...prev, [studentId]: val }));
     setEditingTotal(null);
+  }
+
+  async function savePaid(studentId: string) {
+    const trimmed = paidInput.trim();
+    const val = trimmed === "" || trimmed === "0" ? null : parseInt(trimmed);
+    if (val !== null && (isNaN(val) || val < 1 || val > 99)) return;
+    await fetch("/api/admin/update-sessions", {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ student_id: studentId, paid_lessons: val }),
+    });
+    setPaidMap((prev) => ({ ...prev, [studentId]: val }));
+    setEditingPaid(null);
   }
 
   function startEdit(student: Student) {
@@ -81,6 +99,29 @@ export default function StudentManageTable({ students, sessions, attendance, onS
     setLoading(true);
     const res = await fetch("/api/admin/students", { method: "DELETE", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ id }) });
     if (res.ok) { onStudentsChange(students.filter((s) => s.id !== id)); }
+    setLoading(false);
+  }
+
+  async function handleReceipt(student: Student) {
+    setLoading(true);
+    const total = totalMap[student.id] ?? 10;
+    const res = await fetch("/api/admin/receipts", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ student_id: student.id, lessons: total }),
+    });
+    if (res.ok) {
+      const { path, receipt_no } = await res.json();
+      const url = `${window.location.origin}${path}`;
+      try {
+        await navigator.clipboard.writeText(url);
+        alert(`已開立收據 ${receipt_no}，專屬連結已複製，直接貼給家長即可：\n${url}`);
+      } catch {
+        alert(`已開立收據 ${receipt_no}：\n${url}`);
+      }
+    } else {
+      alert("開立收據失敗，請稍後再試");
+    }
     setLoading(false);
   }
 
@@ -165,47 +206,65 @@ export default function StudentManageTable({ students, sessions, attendance, onS
                   </tr>
                 );
               }
-              return (
-                <tr key={student.id} className="hover:bg-[#FBF8F3] transition-colors">
+              {(() => {
+                const paid = paidMap[student.id] ?? null;
+                const overdue = paid !== null && count >= paid;
+                const warning = paid !== null && !overdue && count === paid - 1;
+                return (
+                <tr key={student.id} className={`transition-colors ${overdue ? "bg-[#FFF5F5]" : warning ? "bg-[#FFFBF0]" : "hover:bg-[#FBF8F3]"}`}>
                   <td className="px-5 py-4 text-[#A67C52] font-bold">{idx + 1}</td>
                   <td className="px-5 py-4">
                     <p className="font-bold text-[#2C2017]">{student.name}
                       <span className="text-[#9A8878] font-normal ml-1">({student.parent_name})</span>
                     </p>
+                    {overdue && <span className="inline-block mt-1 text-[10px] font-bold bg-[#FFEBEE] text-[#E53935] px-2 py-0.5 rounded-full">🚨 已超出繳費堂數</span>}
+                    {warning && <span className="inline-block mt-1 text-[10px] font-bold bg-[#FFF3E0] text-[#E65100] px-2 py-0.5 rounded-full">⚠️ 剩1堂，請通知繳費</span>}
                   </td>
                   <td className="px-5 py-4 text-[#9A8878]">{student.time_slot}</td>
                   <td className="px-5 py-4">
-                    <div className="space-y-1.5 min-w-[160px]">
+                    <div className="space-y-2 min-w-[160px]">
+                      {/* Total classes row */}
                       <div className="flex justify-between items-center text-xs text-[#9A8878]">
-                        <span>{count} / {total} 堂</span>
+                        <span>上課 {count} / {total} 堂</span>
                         <div className="flex items-center gap-1">
                           <span>{pct}%</span>
                           {editingTotal === student.id ? (
                             <div className="flex items-center gap-1 ml-1">
-                              <input
-                                type="number"
-                                value={totalInput}
-                                onChange={(e) => setTotalInput(e.target.value)}
+                              <input type="number" value={totalInput} onChange={(e) => setTotalInput(e.target.value)}
                                 onKeyDown={(e) => { if (e.key === "Enter") saveTotal(student.id); if (e.key === "Escape") setEditingTotal(null); }}
                                 className="w-12 border border-[#A67C52] rounded-lg px-1.5 py-0.5 text-xs text-center focus:outline-none"
-                                min={1} max={99} autoFocus
-                              />
-                              <button onClick={() => saveTotal(student.id)} className="text-[#A67C52] hover:text-[#8B6340] text-xs font-bold">✓</button>
-                              <button onClick={() => setEditingTotal(null)} className="text-[#9A8878] hover:text-red-400 text-xs">✕</button>
+                                min={1} max={99} autoFocus />
+                              <button onClick={() => saveTotal(student.id)} className="text-[#A67C52] text-xs font-bold">✓</button>
+                              <button onClick={() => setEditingTotal(null)} className="text-[#9A8878] text-xs">✕</button>
                             </div>
                           ) : (
-                            <button
-                              onClick={() => { setEditingTotal(student.id); setTotalInput(String(total)); }}
-                              className="ml-1 text-[#9A8878] hover:text-[#A67C52] transition-colors"
-                              title="調整總堂數"
-                            >
-                              ✎
-                            </button>
+                            <button onClick={() => { setEditingTotal(student.id); setTotalInput(String(total)); setEditingPaid(null); }}
+                              className="ml-1 text-[#9A8878] hover:text-[#A67C52]" title="調整總堂數">✎</button>
                           )}
                         </div>
                       </div>
                       <div className="w-full bg-[#EDE5D8] rounded-full h-1.5 overflow-hidden">
                         <div className="h-full bg-[#A67C52] rounded-full" style={{ width: `${Math.min(pct, 100)}%` }} />
+                      </div>
+                      {/* Paid lessons row */}
+                      <div className={`flex items-center justify-between text-xs rounded-lg px-2 py-1 ${overdue ? "bg-[#FFEBEE]" : warning ? "bg-[#FFF3E0]" : "bg-[#F5F0E8]"}`}>
+                        <span className={overdue ? "text-[#E53935] font-semibold" : warning ? "text-[#E65100] font-semibold" : "text-[#9A8878]"}>
+                          已繳：{paid !== null ? `${paid} 堂` : "—"}
+                        </span>
+                        {editingPaid === student.id ? (
+                          <div className="flex items-center gap-1">
+                            <input type="number" value={paidInput} onChange={(e) => setPaidInput(e.target.value)}
+                              onKeyDown={(e) => { if (e.key === "Enter") savePaid(student.id); if (e.key === "Escape") setEditingPaid(null); }}
+                              placeholder="堂數"
+                              className="w-12 border border-[#A67C52] rounded-lg px-1.5 py-0.5 text-xs text-center focus:outline-none"
+                              min={0} max={99} autoFocus />
+                            <button onClick={() => savePaid(student.id)} className="text-[#A67C52] text-xs font-bold">✓</button>
+                            <button onClick={() => setEditingPaid(null)} className="text-[#9A8878] text-xs">✕</button>
+                          </div>
+                        ) : (
+                          <button onClick={() => { setEditingPaid(student.id); setPaidInput(paid !== null ? String(paid) : ""); setEditingTotal(null); }}
+                            className="text-[#9A8878] hover:text-[#A67C52] text-xs" title="設定已繳堂數">✎</button>
+                        )}
                       </div>
                     </div>
                   </td>
@@ -239,6 +298,7 @@ export default function StudentManageTable({ students, sessions, attendance, onS
                   </td>
                   <td className="px-5 py-4">
                     <div className="flex gap-3">
+                      <button onClick={() => handleReceipt(student)} disabled={loading} className="text-xs text-[#4CAF50] hover:underline font-medium">收據</button>
                       <button onClick={() => startEdit(student)} className="text-xs text-[#A67C52] hover:underline font-medium">編輯</button>
                       <button onClick={() => handleReset(student.id, student.name)} className="text-xs text-orange-400 hover:underline font-medium">歸零</button>
                       <button onClick={() => handleDelete(student.id)} className="text-xs text-[#E57373] hover:underline font-medium">刪除</button>
@@ -246,6 +306,7 @@ export default function StudentManageTable({ students, sessions, attendance, onS
                   </td>
                 </tr>
               );
+              })()}
             })}
             {displayed.length === 0 && (
               <tr><td colSpan={6} className="px-5 py-10 text-center text-[#9A8878]">尚無資料</td></tr>

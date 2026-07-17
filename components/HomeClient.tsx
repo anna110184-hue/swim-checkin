@@ -13,6 +13,7 @@ interface StudentData {
   course_type: "regular" | "trial";
   attended: number;
   total: number;
+  paidLessons: number | null;
   checkedInToday: boolean;
   substituteToday: string | null;
   paymentClaimedToday: boolean;
@@ -94,6 +95,7 @@ export default function HomeClient({ satStudents, sunStudents, today, defaultTab
               today={today}
               attended={s.attended}
               total={s.total}
+              paidLessons={s.paidLessons}
               checkedInToday={s.checkedInToday}
               substituteToday={s.substituteToday}
               paymentClaimedToday={s.paymentClaimedToday}

@@ -43,6 +43,7 @@ export interface Database {
           id: string;
           student_id: string;
           total_classes: number;
+          paid_lessons: number | null;
           start_date: string;
           created_at: string;
         };
@@ -50,6 +51,7 @@ export interface Database {
           id?: string;
           student_id: string;
           total_classes?: number;
+          paid_lessons?: number | null;
           start_date: string;
           created_at?: string;
         };
@@ -57,6 +59,7 @@ export interface Database {
           id?: string;
           student_id?: string;
           total_classes?: number;
+          paid_lessons?: number | null;
           start_date?: string;
           created_at?: string;
         };

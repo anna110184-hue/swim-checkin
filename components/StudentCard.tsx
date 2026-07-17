@@ -18,6 +18,7 @@ interface StudentCardProps {
   index: number;
   attended: number;
   total: number;
+  paidLessons?: number | null;
   checkedInToday: boolean;
   substituteToday: string | null;
   paymentClaimedToday: boolean;
@@ -31,6 +32,7 @@ export default function StudentCard({
   index,
   attended,
   total,
+  paidLessons = null,
   checkedInToday,
   substituteToday,
   paymentClaimedToday,
@@ -170,6 +172,26 @@ export default function StudentCard({
             <div>
               <p className="text-xs font-bold text-[#E65100]">課程已完成！</p>
               <p className="text-xs text-[#BF360C] mt-0.5">請聯繫老師安排續課</p>
+            </div>
+          </div>
+        )}
+
+        {/* Payment reminder banners */}
+        {paidLessons !== null && count >= paidLessons && (
+          <div className="bg-[#FFEBEE] border border-[#EF9A9A] rounded-2xl px-4 py-3 flex items-center gap-2">
+            <span className="text-lg">🚨</span>
+            <div>
+              <p className="text-xs font-bold text-[#C62828]">已超出繳費堂數</p>
+              <p className="text-xs text-[#B71C1C] mt-0.5">請盡快聯繫老師繳費</p>
+            </div>
+          </div>
+        )}
+        {paidLessons !== null && count === paidLessons - 1 && (
+          <div className="bg-[#FFF8E1] border border-[#FFD54F] rounded-2xl px-4 py-3 flex items-center gap-2">
+            <span className="text-lg">⚠️</span>
+            <div>
+              <p className="text-xs font-bold text-[#E65100]">還剩 1 堂已繳費課程</p>
+              <p className="text-xs text-[#BF360C] mt-0.5">請記得聯繫老師繳下期學費</p>
             </div>
           </div>
         )}
