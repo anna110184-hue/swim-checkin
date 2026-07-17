@@ -197,6 +197,10 @@ export default function StudentManageTable({ students, sessions, attendance, onS
               const count = getAttendedCount(student.id);
               const total = totalMap[student.id] ?? 10;
               const pct = Math.round((count / total) * 100);
+              const paid = paidMap[student.id] ?? null;
+              const overdue = paid !== null && count >= paid;
+              const warning = paid !== null && !overdue && count === paid - 1;
+
               if (editId === student.id) {
                 return (
                   <tr key={student.id}>
@@ -206,11 +210,8 @@ export default function StudentManageTable({ students, sessions, attendance, onS
                   </tr>
                 );
               }
-              {(() => {
-                const paid = paidMap[student.id] ?? null;
-                const overdue = paid !== null && count >= paid;
-                const warning = paid !== null && !overdue && count === paid - 1;
-                return (
+
+              return (
                 <tr key={student.id} className={`transition-colors ${overdue ? "bg-[#FFF5F5]" : warning ? "bg-[#FFFBF0]" : "hover:bg-[#FBF8F3]"}`}>
                   <td className="px-5 py-4 text-[#A67C52] font-bold">{idx + 1}</td>
                   <td className="px-5 py-4">
@@ -306,7 +307,6 @@ export default function StudentManageTable({ students, sessions, attendance, onS
                   </td>
                 </tr>
               );
-              })()}
             })}
             {displayed.length === 0 && (
               <tr><td colSpan={6} className="px-5 py-10 text-center text-[#9A8878]">尚無資料</td></tr>
