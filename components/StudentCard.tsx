@@ -162,6 +162,18 @@ export default function StudentCard({
           </div>
         </div>
 
+        {/* Substitute banner — shown prominently whenever a substitute is recorded */}
+        {substituteName && (
+          <div className="bg-[#EEF2FF] border-2 border-[#7986CB] rounded-2xl px-4 py-3 flex items-center gap-3">
+            <span className="text-xl shrink-0">👥</span>
+            <div className="flex-1 min-w-0">
+              <p className="text-xs font-bold text-[#3949AB] tracking-wide">今日代上</p>
+              <p className="text-base font-bold text-[#283593] mt-0.5">{substituteName}</p>
+            </div>
+            <span className="text-xs font-semibold text-[#7986CB] bg-white px-2.5 py-1 rounded-xl border border-[#C5CAE9] shrink-0">代課</span>
+          </div>
+        )}
+
         {/* Progress */}
         <ProgressDots attended={count} total={total} />
 
@@ -193,13 +205,6 @@ export default function StudentCard({
               <p className="text-xs font-bold text-[#E65100]">還剩 1 堂已繳費課程</p>
               <p className="text-xs text-[#BF360C] mt-0.5">請記得聯繫老師繳下期學費</p>
             </div>
-          </div>
-        )}
-
-        {/* Substitute badge */}
-        {checked && substituteName && (
-          <div className="bg-[#EEF2FF] text-[#7986CB] text-sm font-medium px-4 py-2.5 rounded-2xl border border-[#C5CAE9]">
-            本週由 {substituteName} 代上 ✓
           </div>
         )}
 
