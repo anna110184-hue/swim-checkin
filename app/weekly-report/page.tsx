@@ -4,8 +4,6 @@ import Link from "next/link";
 
 export const revalidate = 0;
 
-const PRICE_PER_LESSON = 45;
-
 export default async function PublicWeeklyReportPage() {
   const supabase = createServiceClient();
   const { start, end, days } = getThisWeekRange();
@@ -32,17 +30,13 @@ export default async function PublicWeeklyReportPage() {
       .filter((s: any) => s.day_of_week === dow)
       .map((s: any) => {
         const records = attendanceList.filter((a: any) => a.student_id === s.id);
-        const amount = records.length * PRICE_PER_LESSON;
-        return { ...s, records, attended: records.length > 0, amount };
+        return { ...s, records, attended: records.length > 0 };
       });
   }
 
   const satStudents = getAttendees("sat");
   const sunStudents = getAttendees("sun");
-  const totalLessons = attendanceList.length;
-  const totalAmount = totalLessons * PRICE_PER_LESSON;
   const satAttended = satStudents.filter((s: any) => s.attended).length;
-  const sunAttended = sunStudents.filter((s: any) => s.attended).length;
 
   return (
     <div className="min-h-screen bg-[#F5F0E8]">
@@ -64,7 +58,7 @@ export default async function PublicWeeklyReportPage() {
         <div className="grid grid-cols-2 gap-3">
           {[
             { label: "週六出席", value: `${satAttended} 位`, sub: `共 ${satStudents.length} 位` },
-            { label: "本週總堂數", value: `${satStudents.filter((s: any) => s.attended).length} 堂`, sub: "每堂 $45" },
+            { label: "本週總堂數", value: `${satAttended} 堂`, sub: "本週上課紀錄" },
           ].map((c) => (
             <div key={c.label} className="bg-white rounded-2xl border border-[#EDE5D8] p-4 text-center">
               <p className="text-xs text-[#9A8878] font-semibold">{c.label}</p>
@@ -113,7 +107,6 @@ type StudentRow = {
   id: string;
   name: string;
   time_slot: string;
-  amount: number;
   records: { attended_date: string; is_makeup: boolean; substitute_name: string | null }[];
   attended: boolean;
 };
@@ -133,19 +126,16 @@ function DaySection({ title, students }: { title: string; students: StudentRow[]
           </div>
           <ul className="divide-y divide-[#F5F0E8]">
             {attended.map((s) => (
-              <li key={s.id} className="flex items-center justify-between px-5 py-3 gap-3">
-                <div className="flex items-center gap-2 min-w-0">
-                  <span className="font-semibold text-[#2C2017] text-sm">{s.name}</span>
-                  <span className="text-xs text-[#9A8878]">{s.time_slot}</span>
-                  {s.records.map((r) => (
-                    <span key={r.attended_date} className="text-xs bg-[#A67C52]/10 text-[#A67C52] px-2 py-0.5 rounded-full font-medium">
-                      {formatDisplayDate(r.attended_date)}
-                      {r.substitute_name ? ` (${r.substitute_name}代)` : ""}
-                      {r.is_makeup ? " 補" : ""}
-                    </span>
-                  ))}
-                </div>
-                <span className="text-sm font-bold text-[#2C2017] shrink-0">${s.amount}</span>
+              <li key={s.id} className="flex items-center gap-3 px-5 py-3 flex-wrap">
+                <span className="font-semibold text-[#2C2017] text-sm">{s.name}</span>
+                <span className="text-xs text-[#9A8878]">{s.time_slot}</span>
+                {s.records.map((r) => (
+                  <span key={r.attended_date} className="text-xs bg-[#A67C52]/10 text-[#A67C52] px-2 py-0.5 rounded-full font-medium">
+                    {formatDisplayDate(r.attended_date)}
+                    {r.substitute_name ? ` (${r.substitute_name}代)` : ""}
+                    {r.is_makeup ? " 補" : ""}
+                  </span>
+                ))}
               </li>
             ))}
           </ul>

@@ -7,6 +7,9 @@ import UploadSection from "./UploadSection";
 export const revalidate = 0;
 
 const PRICE_PER_LESSON = 45;
+const SPECIAL_PRICES: Record<string, number> = {
+  Zachary: 30,
+};
 
 export default async function WeeklyReportPage() {
   const supabase = createServiceClient();
@@ -39,14 +42,15 @@ export default async function WeeklyReportPage() {
     );
     const totalLessons = records.length;
     const claimed = records.some((a) => a.payment_claimed);
-    return { student: s, records, totalLessons, amountDue: totalLessons * PRICE_PER_LESSON, claimed };
+    const price = SPECIAL_PRICES[s.name] ?? PRICE_PER_LESSON;
+    return { student: s, records, totalLessons, amountDue: totalLessons * price, claimed };
   }).filter((r) => r.totalLessons > 0);
 
   const satRows: WeekRow[] = rows.filter((r) => r.student.day_of_week === "sat");
   const sunRows: WeekRow[] = rows.filter((r) => r.student.day_of_week === "sun");
 
   const totalLessons = rows.reduce((s, r) => s + r.totalLessons, 0);
-  const totalAmount = totalLessons * PRICE_PER_LESSON;
+  const totalAmount = rows.reduce((s, r) => s + r.amountDue, 0);
   const claimedCount = rows.filter((r) => r.claimed).length;
   const claimedAmount = rows.filter((r) => r.claimed).reduce((s, r) => s + r.amountDue, 0);
 
@@ -167,7 +171,12 @@ function Section({ title, rows }: { title: string; rows: SectionRow[] }) {
                     ))}
                   </div>
                 </td>
-                <td className="px-5 py-3.5 font-bold text-[#2C2017]">${amountDue}</td>
+                <td className="px-5 py-3.5">
+                  <span className="font-bold text-[#2C2017]">${amountDue}</span>
+                  {SPECIAL_PRICES[student.name] !== undefined && (
+                    <span className="ml-1.5 text-xs text-[#9A8878]">(${SPECIAL_PRICES[student.name]}/堂)</span>
+                  )}
+                </td>
                 <td className="px-5 py-3.5">
                   {claimed ? (
                     <span className="text-xs font-semibold px-3 py-1 rounded-full bg-[#E8F5E9] text-[#4CAF50] border border-[#C8E6C9]">已轉帳</span>
