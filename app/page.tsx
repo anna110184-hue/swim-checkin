@@ -17,7 +17,7 @@ export default async function HomePage() {
     { data: settings },
   ] = await Promise.all([
     supabase.from("students").select("*, sessions(id, total_classes, start_date)").order("time_slot"),
-    supabase.from("attendance").select("*").eq("is_cancelled", false),
+    service.from("attendance").select("*").eq("is_cancelled", false),
     supabase.from("notices").select("*").eq("is_active", true).order("created_at", { ascending: false }),
     service.from("settings").select("*"),
   ]);
