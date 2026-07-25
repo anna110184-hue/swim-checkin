@@ -48,8 +48,9 @@ export default async function PublicWeeklyReportPage() {
             {formatDisplayDate(start)} ～ {formatDisplayDate(end)}
           </p>
         </div>
-        <div className="flex gap-2 mt-1">
+        <div className="flex gap-2 mt-1 flex-wrap justify-end">
           <CopyLinkButton />
+          <Link href="/history" className="btn-outline text-sm">歷史週報</Link>
           <Link href="/" className="btn-outline text-sm">← 返回首頁</Link>
         </div>
       </header>
