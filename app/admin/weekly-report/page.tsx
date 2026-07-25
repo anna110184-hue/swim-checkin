@@ -2,6 +2,7 @@ import { createServiceClient } from "@/lib/supabase/server";
 import { getThisWeekRange, formatDisplayDate } from "@/lib/utils";
 import Link from "next/link";
 import PrintButton from "./PrintButton";
+import ShareButton from "./ShareButton";
 import UploadSection from "./UploadSection";
 
 export const revalidate = 0;
@@ -75,6 +76,7 @@ export default async function WeeklyReportPage() {
           </p>
         </div>
         <div className="flex items-center gap-3">
+          <ShareButton weekStart={start} />
           <PrintButton />
           <Link href="/admin" className="btn-outline text-sm print:hidden">← 返回後台</Link>
         </div>
