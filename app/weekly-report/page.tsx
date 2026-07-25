@@ -1,6 +1,7 @@
 import { createServiceClient } from "@/lib/supabase/server";
 import { getThisWeekRange, formatDisplayDate } from "@/lib/utils";
 import Link from "next/link";
+import CopyLinkButton from "./CopyLinkButton";
 
 export const revalidate = 0;
 
@@ -47,7 +48,10 @@ export default async function PublicWeeklyReportPage() {
             {formatDisplayDate(start)} ～ {formatDisplayDate(end)}
           </p>
         </div>
-        <Link href="/" className="btn-outline text-sm mt-1">← 返回首頁</Link>
+        <div className="flex gap-2 mt-1">
+          <CopyLinkButton />
+          <Link href="/" className="btn-outline text-sm">← 返回首頁</Link>
+        </div>
       </header>
 
       <div className="h-px bg-[#D4C8B8] mx-6" />
