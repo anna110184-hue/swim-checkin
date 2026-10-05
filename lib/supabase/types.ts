@@ -14,6 +14,7 @@ export interface Database {
           course_type: "regular" | "trial";
           parent_email: string | null;
           created_at: string;
+          sort_order: number | null;
         };
         Insert: {
           id?: string;
@@ -25,6 +26,7 @@ export interface Database {
           course_type?: "regular" | "trial";
           parent_email?: string | null;
           created_at?: string;
+          sort_order?: number | null;
         };
         Update: {
           id?: string;
@@ -36,6 +38,7 @@ export interface Database {
           course_type?: "regular" | "trial";
           parent_email?: string | null;
           created_at?: string;
+          sort_order?: number | null;
         };
       };
       sessions: {
