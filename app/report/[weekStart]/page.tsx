@@ -5,9 +5,9 @@ import { notFound } from "next/navigation";
 
 export const revalidate = 0;
 
-const PRICE_PER_LESSON = 45;
+const PRICE_PER_LESSON = 50;
 const SPECIAL_PRICES: Record<string, number> = {
-  Zachary: 30,
+  Zachary: 40,
 };
 
 export default async function TeacherWeeklyReportPage({

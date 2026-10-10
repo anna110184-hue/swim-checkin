@@ -7,9 +7,9 @@ import UploadSection from "./UploadSection";
 
 export const revalidate = 0;
 
-const PRICE_PER_LESSON = 45;
+const PRICE_PER_LESSON = 50;
 const SPECIAL_PRICES: Record<string, number> = {
-  Zachary: 30,
+  Zachary: 40,
 };
 
 export default async function WeeklyReportPage() {
@@ -90,7 +90,7 @@ export default async function WeeklyReportPage() {
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
           {[
             { label: "本週出席", value: `${totalLessons} 堂`, sub: `共 ${rows.length} 位` },
-            { label: "應收總額", value: `$${totalAmount}`, sub: "每堂 $45" },
+            { label: "應收總額", value: `$${totalAmount}`, sub: "每堂 $50" },
             { label: "已通知轉帳", value: `${claimedCount} 位`, sub: `$${claimedAmount}` },
             { label: "待轉帳", value: `${rows.length - claimedCount} 位`, sub: `$${totalAmount - claimedAmount}` },
           ].map((c) => (
